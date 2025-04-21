@@ -13,8 +13,17 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Inputed commit name
-        run: echo "${{ inputs.commit }}"
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      - name: Setup GoReleaser
+        uses: goreleaser/goreleaser-action@v6
+        with:
+          install-only: true
+          version: latest
 
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -23,4 +32,104 @@ jobs:
           
       - name: Git log
         run: git log
+        
+      - name: Build and save syncer image
+        run: |
+          set -x
+          # Build syncer
+          TELEMETRY_PRIVATE_KEY="" goreleaser build --single-target --snapshot --id vcluster --clean --output ./vcluster
+          docker build -t "vcluster:test" -f Dockerfile.release --build-arg TARGETARCH=amd64 --build-arg TARGETOS=linux .
+
+      - uses: azure/setup-helm@v4
+        name: Setup Helm
+        with:
+          version: "v3.11.0"
+
+      - name: Set up kind k8s cluster
+        uses: engineerd/setup-kind@v0.5.0
+        with:
+          version: "v0.26.0"
+          image: kindest/node:v1.32.0@sha256:c48c62eac5da28cdadcf560d1d8616cfa6783b58f0d94cf63ad1bf49600cb027
+
+      - name: Testing kind cluster set-up
+        run: |
+          set -x
+          kubectl cluster-info
+          kubectl get pods -n kube-system
+          echo "kubectl config current-context:" $(kubectl config current-context)
+          echo "KUBECONFIG env var:" ${KUBECONFIG}
+
+      - name: Create vcluster
+        id: create-vcluster
+        run: |
+          set -x
+
+          kubectl create namespace from-host-sync-test
+          kubectl create namespace from-host-sync-test-2
+
+          sed -i "s|REPLACE_REPOSITORY_NAME|vcluster|g" test/commonValues.yaml
+          sed -i "s|REPLACE_TAG_NAME|test|g" test/commonValues.yaml
+          
+          kind load docker-image vcluster:test
+
+          helm upgrade vcluster ./chart --create-namespace --namespace vcluster --install --repository-config='' \
+            --values ./test/commonValues.yaml --values ./test/e2e/values.yaml --debug
+        continue-on-error: true
+
+      - name: Wait until vcluster is ready
+        id: wait-until-vcluster-is-ready
+        if: steps.create-vcluster.outcome == 'success'
+        run: |
+          set -x
+
+          ./hack/wait-for-pod.sh -l app=${{ env.VCLUSTER_SUFFIX }} -n ${{ env.VCLUSTER_NAMESPACE }}
+
+        continue-on-error: true
+
+      - name: Collect deployment information in case vcluster fails to start
+        if: steps.wait-until-vcluster-is-ready.outcome != 'success'
+        run: |
+          set -x
+          kubectl get pods -o yaml -n ${{ env.VCLUSTER_NAMESPACE }}
+          echo "======================================================================================================================"
+          kubectl get events -n ${{ env.VCLUSTER_NAMESPACE }} --sort-by='.lastTimestamp'
+          echo "======================================================================================================================"
+          kubectl logs -l app=${{ env.VCLUSTER_SUFFIX }} -n ${{ env.VCLUSTER_NAMESPACE }} -c syncer --tail=-1 -p || kubectl logs -l app=${{ env.VCLUSTER_SUFFIX }} -n ${{ env.VCLUSTER_NAMESPACE }} -c syncer --tail=-1
+          echo "======================================================================================================================"
+          if [[ "${{ matrix.test-suite-path }}" = "./test/e2e_plugin" ]]; then
+            kubectl logs -l app=${{ env.VCLUSTER_SUFFIX }} -n ${{ env.VCLUSTER_NAMESPACE }} -c bootstrap-with-deployment --tail=-1 -p || kubectl logs -l app=${{ env.VCLUSTER_SUFFIX }} -n ${{ env.VCLUSTER_NAMESPACE }} -c bootstrap-with-deployment --tail=-1
+            echo "======================================================================================================================"
+          fi
+          kubectl describe pods -n ${{ env.VCLUSTER_NAMESPACE }}
+          exit 1
+
+      # Skips NetworkPolicy tests because they require network plugin with support (e.g. Calico)
+      - name: Execute e2e tests
+        id: execute-e2e-tests
+        working-directory: test/e2e
+        run: |
+          set -x
+
+          VCLUSTER_SUFFIX=${{ env.VCLUSTER_SUFFIX }} \
+          VCLUSTER_NAME=${{ env.VCLUSTER_NAME }} \
+          VCLUSTER_NAMESPACE=${{ env.VCLUSTER_NAMESPACE }} \
+          MULTINAMESPACE_MODE=${{ matrix.multinamespace-mode }} \
+          go test -timeout 40m -mod=vendor -test.v --ginkgo.v --ginkgo.skip=".*NetworkPolicy.*" --ginkgo.skip=".*Snapshot.*" .
+
+        continue-on-error: true
+
+      - name: Print logs if e2e tests fail
+        if: steps.execute-e2e-tests.outcome == 'failure'
+        run: |
+          set -x
+          kubectl get pods -o yaml -n ${{ env.VCLUSTER_NAMESPACE }}
+          echo "======================================================================================================================"
+          kubectl get events -n ${{ env.VCLUSTER_NAMESPACE }} --sort-by='.lastTimestamp'
+          echo "======================================================================================================================"
+          kubectl logs -l app=${{ env.VCLUSTER_SUFFIX }} -n ${{ env.VCLUSTER_NAMESPACE }} -c syncer --tail=-1 -p || kubectl logs -l app=${{ env.VCLUSTER_SUFFIX }} -n ${{ env.VCLUSTER_NAMESPACE }} -c syncer --tail=-1
+          echo "======================================================================================================================"
+          kubectl describe pods -n ${{ env.VCLUSTER_NAMESPACE }}
+          exit 1
+
+
           
