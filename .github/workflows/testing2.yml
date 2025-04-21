@@ -9,11 +9,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          repository: zmackiv/bachelor_project
-          ref: main
+      - name: Clone private repo A
+        env:
+          TOKEN: ${{ secrets.SECRET_TO_BP }}
+        run: |
+          git config --global url."https://${TOKEN}@github.com/".insteadOf "https://github.com/"
+          git clone https://github.com/zmackiv/bachelor_project.git
           
       - name: Git log
         run: git log
