@@ -1,0 +1,20 @@
+name: Testing Workflow
+
+on: 
+  workflow_dispatch:
+  
+
+jobs:
+  manual:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          name: zmackiv/bachelor_project
+          ref: main
+          
+      - name: Git log
+        run: git log
+          
