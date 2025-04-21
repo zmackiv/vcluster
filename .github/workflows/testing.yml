@@ -74,14 +74,13 @@ jobs:
           helm upgrade vcluster ./chart --create-namespace --namespace vcluster --install --repository-config='' \
             --values ./test/commonValues.yaml --values ./test/e2e/values.yaml --debug
         continue-on-error: true
-
+      
       - name: Wait until vcluster is ready
         id: wait-until-vcluster-is-ready
         if: steps.create-vcluster.outcome == 'success'
         run: |
           set -x
-
-          ./hack/wait-for-pod.sh -l app=${{ env.VCLUSTER_SUFFIX }} -n ${{ env.VCLUSTER_NAMESPACE }}
+          timeout 5m ./hack/wait-for-pod.sh -l app=vcluster -n vcluster
 
         continue-on-error: true
 
@@ -89,17 +88,17 @@ jobs:
         if: steps.wait-until-vcluster-is-ready.outcome != 'success'
         run: |
           set -x
-          kubectl get pods -o yaml -n ${{ env.VCLUSTER_NAMESPACE }}
+          kubectl get pods -o yaml -n vcluster
           echo "======================================================================================================================"
-          kubectl get events -n ${{ env.VCLUSTER_NAMESPACE }} --sort-by='.lastTimestamp'
+          kubectl get events -n vcluster --sort-by='.lastTimestamp'
           echo "======================================================================================================================"
-          kubectl logs -l app=${{ env.VCLUSTER_SUFFIX }} -n ${{ env.VCLUSTER_NAMESPACE }} -c syncer --tail=-1 -p || kubectl logs -l app=${{ env.VCLUSTER_SUFFIX }} -n ${{ env.VCLUSTER_NAMESPACE }} -c syncer --tail=-1
+          kubectl logs -l app=vcluster -n vcluster -c syncer --tail=-1 -p || kubectl logs -l app=vcluster -n vcluster -c syncer --tail=-1
           echo "======================================================================================================================"
           if [[ "${{ matrix.test-suite-path }}" = "./test/e2e_plugin" ]]; then
-            kubectl logs -l app=${{ env.VCLUSTER_SUFFIX }} -n ${{ env.VCLUSTER_NAMESPACE }} -c bootstrap-with-deployment --tail=-1 -p || kubectl logs -l app=${{ env.VCLUSTER_SUFFIX }} -n ${{ env.VCLUSTER_NAMESPACE }} -c bootstrap-with-deployment --tail=-1
+            kubectl logs -l app=vcluster -n vcluster -c bootstrap-with-deployment --tail=-1 -p || kubectl logs -l app=vcluster -n vcluster -c bootstrap-with-deployment --tail=-1
             echo "======================================================================================================================"
           fi
-          kubectl describe pods -n ${{ env.VCLUSTER_NAMESPACE }}
+          kubectl describe pods -n vcluster
           exit 1
 
       # Skips NetworkPolicy tests because they require network plugin with support (e.g. Calico)
@@ -111,9 +110,9 @@ jobs:
           
           kubectl port-forward -n vcluster vcluster-0 8081:8081 &
           
-          VCLUSTER_SUFFIX=${{ env.VCLUSTER_SUFFIX }} \
-          VCLUSTER_NAME=${{ env.VCLUSTER_NAME }} \
-          VCLUSTER_NAMESPACE=${{ env.VCLUSTER_NAMESPACE }} \
+          VCLUSTER_SUFFIX=vcluster \
+          VCLUSTER_NAME=vcluster \
+          VCLUSTER_NAMESPACE=vcluster \
           MULTINAMESPACE_MODE=${{ matrix.multinamespace-mode }} \
           go test -timeout 40m -mod=vendor -test.v --ginkgo.v --ginkgo.skip=".*NetworkPolicy.*" --ginkgo.skip=".*Snapshot.*" .
 
@@ -123,13 +122,13 @@ jobs:
         if: steps.execute-e2e-tests.outcome == 'failure'
         run: |
           set -x
-          kubectl get pods -o yaml -n ${{ env.VCLUSTER_NAMESPACE }}
+          kubectl get pods -o yaml -n vcluster
           echo "======================================================================================================================"
-          kubectl get events -n ${{ env.VCLUSTER_NAMESPACE }} --sort-by='.lastTimestamp'
+          kubectl get events -n vcluster --sort-by='.lastTimestamp'
           echo "======================================================================================================================"
-          kubectl logs -l app=${{ env.VCLUSTER_SUFFIX }} -n ${{ env.VCLUSTER_NAMESPACE }} -c syncer --tail=-1 -p || kubectl logs -l app=${{ env.VCLUSTER_SUFFIX }} -n ${{ env.VCLUSTER_NAMESPACE }} -c syncer --tail=-1
+          kubectl logs -l app=vcluster -n vcluster -c syncer --tail=-1 -p || kubectl logs -l app=vcluster -n vcluster -c syncer --tail=-1
           echo "======================================================================================================================"
-          kubectl describe pods -n ${{ env.VCLUSTER_NAMESPACE }}
+          kubectl describe pods -n vcluster
           exit 1
 
 
