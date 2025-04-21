@@ -32,8 +32,6 @@ jobs:
           install-only: true
           version: latest
 
-      
-        
       - name: Build and save syncer image
         run: |
           set -x
@@ -110,7 +108,9 @@ jobs:
         working-directory: test/e2e
         run: |
           set -x
-
+          
+          kubectl port-forward -n vcluster vcluster-0 8081:8081 &
+          
           VCLUSTER_SUFFIX=${{ env.VCLUSTER_SUFFIX }} \
           VCLUSTER_NAME=${{ env.VCLUSTER_NAME }} \
           VCLUSTER_NAMESPACE=${{ env.VCLUSTER_NAMESPACE }} \
