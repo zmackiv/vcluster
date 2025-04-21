@@ -15,3 +15,12 @@ jobs:
     steps:
       - name: Inputed commit name
         run: echo "${{ inputs.commit }}"
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.commit }}
+          
+      - name: Git log
+        run: git log
+          
