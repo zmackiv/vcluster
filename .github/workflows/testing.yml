@@ -1,0 +1,17 @@
+name: Testing Workflow
+
+on: 
+  workflow_dispatch:
+    inputs:
+      commit:
+        description: "Commit"
+        type: string
+        # default:
+
+jobs:
+  manual:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Inputed commit name
+        run: echo "${{ inputs.commit }}"
