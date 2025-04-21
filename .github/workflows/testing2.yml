@@ -12,7 +12,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          name: zmackiv/bachelor_project
+          repository: zmackiv/bachelor_project
           ref: main
           
       - name: Git log
