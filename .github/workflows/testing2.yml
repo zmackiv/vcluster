@@ -9,6 +9,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Checkout this repo
+        uses: actions/checkout@v4
+        
       - name: Clone private repo A
         env:
           TOKEN: ${{ secrets.SECRET_TO_BP }}
@@ -17,5 +20,7 @@ jobs:
           git clone https://github.com/zmackiv/bachelor_project.git
           
       - name: Git log
-        run: git log
+        run: |
+          cd bachelor_project
+          git log
           
