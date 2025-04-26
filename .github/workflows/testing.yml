@@ -46,11 +46,12 @@ jobs:
           export GOPRIVATE=github.com/zmackiv
           echo "machine github.com login zmackiv password ${{ secrets.BP_SECRET }}" > ~/.netrc
           git fetch origin 65bb8f03460ca71d67330782741e012cc130cb4c
-          git cherry-pick 65bb8f03460ca71d67330782741e012cc130cb4c --strategy-option theirs
+          git cherry-pick 65bb8f03460ca71d67330782741e012cc130cb4c -n --strategy-option theirs
           git fetch origin 95bc7dc74a85b7021881c684f298ff4d1e840f9e
-          git cherry-pick 95bc7dc74a85b7021881c684f298ff4d1e840f9e --strategy-option theirs
+          git cherry-pick 95bc7dc74a85b7021881c684f298ff4d1e840f9e -n --strategy-option theirs
           git fetch origin f096ca943363ac181bd0084ba725bc013f461b5f
-          git cherry-pick f096ca943363ac181bd0084ba725bc013f461b5f --strategy-option theirs
+          git cherry-pick f096ca943363ac181bd0084ba725bc013f461b5f -n --strategy-option theirs
+          git log
           go mod tidy
           go mod vendor
           # Build syncer
