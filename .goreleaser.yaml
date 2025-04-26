@@ -31,6 +31,8 @@ builds:
       - -trimpath
       - -mod
       - vendor
+      - -cover 
+      - -covermode=atomic
     tags:
       - embed_chart
     ldflags:
