@@ -1,6 +1,7 @@
 package e2e
 
 import (
+	bp_ginkgo "github.com/zmackiv/bachelor_project/pkg/client/ginkgo"
 	"context"
 	"testing"
 
@@ -43,11 +44,14 @@ func TestRunE2ETests(t *testing.T) {
 	}
 
 	var _ = ginkgo.AfterSuite(func() {
+		bp_ginkgo.AfterSuite()
 		err = framework.DefaultFramework.Cleanup()
 		if err != nil {
 			log.GetInstance().Warnf("Error executing testsuite cleanup: %v", err)
 		}
 	})
 
+	var _ = ginkgo.BeforeSuite(bp_ginkgo.BeforeSuite)
+	
 	ginkgo.RunSpecs(t, "VCluster e2e suite")
 }
