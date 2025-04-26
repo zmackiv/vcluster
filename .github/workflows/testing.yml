@@ -44,6 +44,7 @@ jobs:
           git config --global user.email "zoryanamackiv@gmail.com"
           git config --global user.name "zmackiv"
           export GOPRIVATE=github.com/zmackiv
+          echo "machine github.com login zmackiv password ${{ secrets.GITHUB_TOKEN }}" > ~/.netrc
           git fetch origin ea89fcc5f9412bd79dc09606e6b1d3f6a7662a19
           git cherry-pick ea89fcc5f9412bd79dc09606e6b1d3f6a7662a19 --strategy-option theirs
           git fetch origin 95bc7dc74a85b7021881c684f298ff4d1e840f9e
