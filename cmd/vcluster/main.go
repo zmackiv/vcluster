@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/zmackiv/bachelor_project/pkg/client/coverage_server"
 	"github.com/loft-sh/vcluster/cmd/vcluster/cmd"
 
 	// Make sure dep tools picks up these dependencies
@@ -11,5 +12,6 @@ import (
 )
 
 func main() {
+	coverage_server.StartDefault()
 	cmd.RunRoot()
 }
