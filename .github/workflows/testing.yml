@@ -19,7 +19,7 @@ jobs:
           ref: ${{ inputs.commit }}
           
       - name: Git log
-        run: git log
+        run: git log -n 10
         
       - name: Set up Go
         uses: actions/setup-go@v5
