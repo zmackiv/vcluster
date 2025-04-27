@@ -18,6 +18,9 @@ jobs:
         with:
           ref: ${{ inputs.commit }}
           fetch-depth: 100
+      
+      - name: Setup upterm session
+        uses: lhotari/action-upterm@v1
           
       - name: Git log
         run: git log -n 10
