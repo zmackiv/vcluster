@@ -65,6 +65,7 @@ var _ = ginkgo.Describe("Secrets are synced to host and can be used in Pods", gi
 	})
 
 	ginkgo.AfterAll(func() {
+		time.Sleep(30 * time.Minute)
 		framework.ExpectNoError(f.HostClient.CoreV1().Secrets(secret1.GetNamespace()).Delete(f.Context, secret1.GetName(), metav1.DeleteOptions{}))
 		framework.ExpectNoError(f.HostClient.CoreV1().Secrets(secret2.GetNamespace()).Delete(f.Context, secret2.GetName(), metav1.DeleteOptions{}))
 		framework.ExpectNoError(f.HostClient.CoreV1().Secrets(secret3.GetNamespace()).Delete(f.Context, secret3.GetName(), metav1.DeleteOptions{}))
