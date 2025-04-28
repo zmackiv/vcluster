@@ -25,7 +25,7 @@ import (
 
 const (
 	PollInterval             = 5 * time.Second
-	PollTimeout              = time.Minute
+	PollTimeout              = 10 * time.Minute
 	PollTimeoutLong          = 2 * time.Minute
 	DefaultVClusterName      = "vcluster"
 	DefaultVClusterNamespace = "vcluster"
