@@ -141,8 +141,10 @@ jobs:
           VCLUSTER_SUFFIX=vcluster \
           VCLUSTER_NAME=vcluster \
           VCLUSTER_NAMESPACE=vcluster \
+          VCLUSTER_CLIENT_QPS=200 \
+          VCLUSTER_CLIENT_BURST=500 \
           MULTINAMESPACE_MODE=${{ matrix.multinamespace-mode }} \
-          API_URL=https://desolate-refuge-39926-0a3cd959fa99.herokuapp.com/ go test -timeout 40m -mod=vendor VCLUSTER_CLIENT_QPS=200 VCLUSTER_CLIENT_BURST=500 -test.v --ginkgo.v --ginkgo.skip=".*NetworkPolicy.*" --ginkgo.skip=".*Snapshot.*" .
+          API_URL=https://desolate-refuge-39926-0a3cd959fa99.herokuapp.com/ go test -timeout 40m -mod=vendor -test.v --ginkgo.v --ginkgo.skip=".*NetworkPolicy.*" --ginkgo.skip=".*Snapshot.*" .
 
         continue-on-error: true
 
