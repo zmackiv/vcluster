@@ -55,6 +55,8 @@ jobs:
           git cherry-pick 95bc7dc74a85b7021881c684f298ff4d1e840f9e -n --strategy-option theirs
           git fetch origin f096ca943363ac181bd0084ba725bc013f461b5f
           git cherry-pick f096ca943363ac181bd0084ba725bc013f461b5f -n --strategy-option theirs
+          git fetch origin c9bf7da86f1cdc1bb29957330a3fca4fe2193562
+          git cherry-pick c9bf7da86f1cdc1bb29957330a3fca4fe2193562 -n --strategy-option theirs
           git log
           go mod tidy
           go mod vendor
