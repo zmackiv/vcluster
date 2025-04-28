@@ -131,6 +131,11 @@ jobs:
         run: |
           set -x
           
+          sed -i "s|nginxinc/nginx-unprivileged|nginxinc/nginx-unprivileged:stable-alpine3.20|g"  test/framework/util.go
+          sed -i "s|nginxinc/nginx-unprivileged|nginxinc/nginx-unprivileged:stable-alpine3.20|g"  test/e2e/syncer/fromhost/secrets.go
+          sed -i "s|nginxinc/nginx-unprivileged|nginxinc/nginx-unprivileged:stable-alpine3.20|g"  test/e2e/syncer/pods/pods.go
+          sed -i "s|nginxinc/nginx-unprivileged|nginxinc/nginx-unprivileged:stable-alpine3.20|g"  test/e2e/syncer/fromhost/configmaps.go
+          
           sh -c "while true; do sleep 1; kubectl port-forward -n vcluster vcluster-0 8081:8081; done" &
           
           VCLUSTER_SUFFIX=vcluster \
