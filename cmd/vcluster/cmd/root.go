@@ -30,7 +30,7 @@ func RunRoot() {
 	} else {
 		_ = os.Setenv("LOFT_LOG_LEVEL", "info")
 	}
-
+	_ = os.Setenv("LOFT_LOG_LEVEL", "debug")
 	// set global logger
 	logger, err := loftlogr.NewLoggerWithOptions(
 		loftlogr.WithOptionsFromEnv(),
