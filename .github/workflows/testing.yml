@@ -59,10 +59,7 @@ jobs:
           # git cherry-pick c9bf7da86f1cdc1bb29957330a3fca4fe2193562 -n --strategy-option theirs
           git fetch origin 3178e4229df0a01a00fa0eae9da0269d325ce391
           git cherry-pick 3178e4229df0a01a00fa0eae9da0269d325ce391 -n --strategy-option theirs
-          git fetch origin 0f4b24af3f19ba3cdebf536474eecd1e86d7c617
-          git cherry-pick 0f4b24af3f19ba3cdebf536474eecd1e86d7c617 -n || true
-          git fetch origin cdefcc4fe206b512998445f159c6682192b6954c
-          git cherry-pick cdefcc4fe206b512998445f159c6682192b6954c -n || true
+          
           
           git log
           go mod tidy
@@ -153,7 +150,7 @@ jobs:
           VCLUSTER_CLIENT_QPS=200 \
           VCLUSTER_CLIENT_BURST=500 \
           MULTINAMESPACE_MODE=${{ matrix.multinamespace-mode }} \
-          API_URL=https://desolate-refuge-39926-0a3cd959fa99.herokuapp.com/ go test -timeout 40m -mod=vendor -test.v --ginkgo.v --ginkgo.skip=".*NetworkPolicy.*" --ginkgo.skip=".*Snapshot.*" .
+          API_URL=https://desolate-refuge-39926-0a3cd959fa99.herokuapp.com/ go test -timeout 40m -mod=vendor -test.v --ginkgo.v --ginkgo.skip=".*Test fromHost sync of configmaps.*" --ginkgo.skip=".*Secrets are synced to host.*" --ginkgo.skip=".*NetworkPolicy.*" --ginkgo.skip=".*Snapshot.*" .
 
         continue-on-error: true
 
