@@ -116,7 +116,7 @@ var _ = ginkgo.Describe("Test fromHost sync of configmaps", ginkgo.Ordered, func
 
 	})
 
-	ginkgo.AfterAll(func() {
+	ginkgo.AfterEach(func() {
 		framework.ExpectNoError(f.HostClient.CoreV1().ConfigMaps(configMap1.GetNamespace()).Delete(f.Context, configMap1.GetName(), metav1.DeleteOptions{}))
 		framework.ExpectNoError(f.HostClient.CoreV1().ConfigMaps(configMap2.GetNamespace()).Delete(f.Context, configMap2.GetName(), metav1.DeleteOptions{}))
 		framework.ExpectNoError(f.HostClient.CoreV1().ConfigMaps(configMap4.GetNamespace()).Delete(f.Context, configMap4.GetName(), metav1.DeleteOptions{}))
@@ -133,7 +133,7 @@ var _ = ginkgo.Describe("Test fromHost sync of configmaps", ginkgo.Ordered, func
 		framework.ExpectNoError(f.HostClient.CoreV1().Namespaces().Delete(f.Context, cm1HostNamespace, metav1.DeleteOptions{}))
 	})
 
-	ginkgo.It("create config maps in host", func() {
+	ginkgo.BeforeEach("create config maps in host", func() {
 		_, err := f.HostClient.CoreV1().ConfigMaps(configMap1.GetNamespace()).Create(f.Context, configMap1, metav1.CreateOptions{})
 		framework.ExpectNoError(err)
 		_, err = f.HostClient.CoreV1().ConfigMaps(configMap2.GetNamespace()).Create(f.Context, configMap2, metav1.CreateOptions{})
