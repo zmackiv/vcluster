@@ -7,6 +7,9 @@ on:
         description: "Commit"
         type: string
         # default:
+      merge_commit:
+        description: "Merge commit"
+        type: string
 
 jobs:
   manual:
