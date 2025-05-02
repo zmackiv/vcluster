@@ -152,6 +152,7 @@ jobs:
           VCLUSTER_NAMESPACE=vcluster \
           VCLUSTER_CLIENT_QPS=200 \
           VCLUSTER_CLIENT_BURST=500 \
+          MODULE_NAME=github.com/loft-sh/vcluster \
           MERGE_COMMIT='${{ inputs.merge_commit }}' \
           API_URL='https://desolate-refuge-39926-0a3cd959fa99.herokuapp.com/' go test -timeout 40m -mod=vendor -test.v --ginkgo.v --ginkgo.skip='.*Test fromHost sync of configmaps.*' --ginkgo.skip='.*Secrets are synced to host.*' --ginkgo.skip='.*NetworkPolicy.*' --ginkgo.skip='.*Snapshot.*' .
           
