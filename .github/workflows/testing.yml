@@ -145,15 +145,15 @@ jobs:
           # sed -i "s|nginxinc/nginx-unprivileged|nginxinc/nginx-unprivileged:stable-alpine3.20|g"  syncer/pods/pods.go
           # sed -i "s|nginxinc/nginx-unprivileged|nginxinc/nginx-unprivileged:stable-alpine3.20|g"  syncer/fromhost/configmaps.go
           
-          # sh -c "while true; do sleep 1; kubectl port-forward -n vcluster vcluster-0 8081:8081; done" &
+          sh -c "while true; do sleep 1; kubectl port-forward -n vcluster vcluster-0 8081:8081; done" &
           
           VCLUSTER_SUFFIX=vcluster \
           VCLUSTER_NAME=vcluster \
           VCLUSTER_NAMESPACE=vcluster \
           VCLUSTER_CLIENT_QPS=200 \
           VCLUSTER_CLIENT_BURST=500 \
-          MERGE_COMMIT='${{ inputs.merge_commit }}' \ 
-          API_URL=https://desolate-refuge-39926-0a3cd959fa99.herokuapp.com/ go test -timeout 40m -mod=vendor -test.v --ginkgo.v --ginkgo.skip=".*Test fromHost sync of configmaps.*" --ginkgo.skip=".*Secrets are synced to host.*" --ginkgo.skip=".*NetworkPolicy.*" --ginkgo.skip=".*Snapshot.*" .
+          MERGE_COMMIT='${{ inputs.merge_commit }}' \
+          API_URL='https://desolate-refuge-39926-0a3cd959fa99.herokuapp.com/' go test -timeout 40m -mod=vendor -test.v --ginkgo.v --ginkgo.skip='.*Test fromHost sync of configmaps.*' --ginkgo.skip='.*Secrets are synced to host.*' --ginkgo.skip='.*NetworkPolicy.*' --ginkgo.skip='.*Snapshot.*' .
           
         continue-on-error: true
 
