@@ -132,7 +132,12 @@ jobs:
           fi
           kubectl describe pods -n vcluster
           exit 1
-
+      - name: Build e2e tests
+        working-directory: test/e2e
+        run: |
+          set -x
+          go test -c -timeout 40m -mod=vendor -test.v --ginkgo.v --ginkgo.skip='.*Test fromHost sync of configmaps.*' --ginkgo.skip='.*Secrets are synced to host.*' --ginkgo.skip='.*NetworkPolicy.*' --ginkgo.skip='.*Snapshot.*' .
+          
       # Skips NetworkPolicy tests because they require network plugin with support (e.g. Calico)
       - name: Execute e2e tests
         id: execute-e2e-tests
